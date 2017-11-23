@@ -5,15 +5,20 @@
 from __future__ import print_function
 import time
 import copy
+import math
+from matplotlib import pyplot as plt
 
 Start = [] #Given Matrix
 
 Solved = [] #Solution Matrix
 
+Queue_Length = []
+
 #V = [[0,0],[1,0]]
 #D = [[1,2,3,4,5,6,7,8,9],[1,2]]
 #C = [[0,1],[1,0]] Does not Equal
 #C contains variable indexes in the V list
+
 def AC_Three(V,D,C):
 	Q = []
 	Q = copy.deepcopy(C)
@@ -22,6 +27,7 @@ def AC_Three(V,D,C):
 #performs AC_Three with a given queue
 def AC_Three_Given_Queue(V,D,C,Q,report):
 	valid = True
+	global Queue_Length
 	while valid and len(Q) != 0:
 		if len(D[Q[0][1]]) == 1:
 			if D[Q[0][1]][0] in D[Q[0][0]]:
@@ -33,18 +39,33 @@ def AC_Three_Given_Queue(V,D,C,Q,report):
 		elif len(D[Q[0][1]]) == 0:
 			valid = False
 		del Q[0]
+
+		if report:
+			Queue_Length.append(len(Q))
+		visualize_Queue(Queue_Length)
 	return valid
-		#if report:
-			#queue length reporting
-	
+
+def visualize_Queue(queue):
+
+	data = queue
+
+	#plt.hist(data, bins=bins, alpha=0.5)
+	plt.hist(data)
+	plt.title('Sudoku Solver using AC-3 by Group11')
+	plt.xlabel('Length of the Queue')
+	plt.ylabel('count')
+
+	plt.show()
+	return None
+
 #attempts to solve the sudoku the same way the average person does as a 2d-array
 def human_logic(board):
 	moves = 1
 	while moves > 0: #loops until no moves are made
 		moves = 0
 		places = []
-		possible = [[[True for k in xrange(9)] for j in xrange(9)] for i in xrange(9)] #list of all numbers that can go into every empty spot
-		count = [[0 for k in xrange(9)] for j in xrange(9)] #count of possible nubers for each spot
+		possible = [[[True for k in range(0,9)] for j in range(0,9)] for i in range(0,9)] #list of all numbers that can go into every empty spot
+		count = [[0 for k in range(9)] for j in range(9)] #count of possible nubers for each spot
 		for x in range(0,9): #loop through all spots on the board
 			for y in range(0,9):
 				if board[x][y] == 0: #if spot is empty
@@ -67,9 +88,9 @@ def human_logic(board):
 								moves = moves + 1
 		
 		for x in range(0,9): #loop through all rows, columns and boxes
-			rowhas = [False for k in xrange(9)] #the numbers the row has
-			colhas = [False for k in xrange(9)] #the numbers the column has
-			boxhas = [False for k in xrange(9)] #the numbers the box has
+			rowhas = [False for k in range(9)] #the numbers the row has
+			colhas = [False for k in range(9)] #the numbers the column has
+			boxhas = [False for k in range(9)] #the numbers the box has
 
 			for y in range(0,9): #fill the lists
 				if board[x][y] != 0:
@@ -123,9 +144,9 @@ def human_logic_CSP(V,D,C):
 		moves = 0
 		changed = []
 		
-		rowhas = [[[0,0] for k in xrange(9)] for j in xrange(9)] #a counter of how many places in a row can have each number
-		colhas = [[[0,0] for k in xrange(9)] for j in xrange(9)] #a counter of how many places in a column can have each number
-		boxhas = [[[0,0] for k in xrange(9)] for j in xrange(9)] #a counter of how many places in a box can have each number
+		rowhas = [[[0,0] for k in range(0,9)] for j in range(0,9)] #a counter of how many places in a row can have each number
+		colhas = [[[0,0] for k in range(0,9)] for j in range(0,9)] #a counter of how many places in a column can have each number
+		boxhas = [[[0,0] for k in range(0,9)] for j in range(0,9)] #a counter of how many places in a box can have each number
 
 		for i in range(0,len(V)): #fill the lists
 			if len(D[i]) != 1:
@@ -317,6 +338,8 @@ def solve_sudoku_CSP(Start):
 	print("")
 	#print("Took %.4f seconds to run" % (time.time() - start_time))
 	
+
+
 #Easy Suduko (AC-3 does nothing, fast to solve using logic, fast to solve using recursion)
 Start.append([0,8,0,0,0,0,2,0,0])
 Start.append([0,0,0,0,8,4,0,9,0])
@@ -329,8 +352,12 @@ Start.append([0,3,0,7,1,0,0,0,0])
 Start.append([0,0,8,0,0,0,0,4,0])
 
 solve_sudoku_CSP(Start)
+
+print (len(Queue_Length))
+
 Start = []
 Solved = []
+Queue_Length = []
 print("------------------------------------")
 
 #Solveable by AC-3
@@ -345,8 +372,12 @@ Start.append([8,0,0,2,0,3,0,0,9])
 Start.append([0,0,5,0,1,0,3,0,0])
 
 solve_sudoku_CSP(Start)
+
+print (len(Queue_Length))
+
 Start = []
 Solved = []
+Queue_Length = []
 print("------------------------------------")
 
 #AC-3 does nothing, fast to solve by logic
@@ -361,8 +392,12 @@ Start.append([0,0,0,0,8,5,0,6,0])
 Start.append([6,0,5,0,0,9,0,0,0])
 
 solve_sudoku_CSP(Start)
+
+print (len(Queue_Length))
+
 Start = []
 Solved = []
+Queue_Length = []
 print("------------------------------------")
 
 #Hardest Suduko (impossible to solve using logic, fast to solve using recursion)
@@ -377,8 +412,12 @@ Start.append([0,0,8,5,0,0,0,1,0])
 Start.append([0,9,0,0,0,0,4,0,0])
 
 solve_sudoku_CSP(Start)
+
+print (len(Queue_Length))
+
 Start = []
 Solved = []
+Queue_Length = []
 print("------------------------------------")
 
 #Brute force resistant Suduko (fast to solve using logic, very slow to solve using recursion)
@@ -394,25 +433,7 @@ Start.append([0,0,0,0,4,0,0,0,9])
 	
 solve_sudoku_CSP(Start)
 
-
-
-
-
-
-
-#Start.append([0,0,0,0,0,0,0,0,0])
-#Start.append([0,0,0,0,0,0,0,0,0])
-#Start.append([0,0,0,0,0,0,0,0,0])
-#Start.append([0,0,0,0,0,0,0,0,0])
-#Start.append([0,0,0,0,0,0,0,0,0])
-#Start.append([0,0,0,0,0,0,0,0,0])
-#Start.append([0,0,0,0,0,0,0,0,0])
-#Start.append([0,0,0,0,0,0,0,0,0])
-#Start.append([0,0,0,0,0,0,0,0,0])
-
-
-
-
+print (len(Queue_Length))
 
 
 
